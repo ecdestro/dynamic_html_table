@@ -9,16 +9,6 @@ document.getElementById("table-generator").addEventListener('submit', function(e
     createTable(numCols, numRows);
 });
 
-document.getElementById("file-generator").addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const numCols = parseInt(document.getElementById('numCols').value);
-    const numRows = parseInt(document.getElementById('numRows').value);
-    const fileName = document.getElementById('file-name').value;
-    
-    saveData(numCols, numRows, fileName);
-});
-
 function createTable(numCols, numRows) {
     const tableContainer = document.getElementById("table-container");
 
@@ -41,7 +31,7 @@ function createTable(numCols, numRows) {
     tableContainer.innerHTML = tableHTML;
 }
 
-function saveData(numCols, numRows, fileName) {
+function saveJSON(numCols, numRows, fileName, delimiter) {
     const data = { table: [] };
 
     for (let i = 0; i < numRows; i++) {
@@ -61,6 +51,57 @@ function saveData(numCols, numRows, fileName) {
     link.href = url;
     link.download = fileName + '.json';
 
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+document.getElementById('file-generator').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const numCols = parseInt(document.getElementById('numCols').value);
+    const numRows = parseInt(document.getElementById('numRows').value);
+    const fileName = document.getElementById('file-name').value;
+    const delimiter = document.querySelector('input[name="delimiter"]:checked').value;
+    
+    saveData(numCols, numRows, fileName, delimiter);
+});
+
+function saveData(numCols, numRows, fileName, delimiter) {
+    const data = [];
+    const headerRow = [];
+    for (let j = 0; j < numCols; j++) {
+        const header = document.getElementById(`header-${j}`).value;
+        headerRow.push(header);
+    }
+    data.push(headerRow.join(delimiter));
+    
+    for (let i = 0; i < numRows; i++) {
+        const rowData = [];
+        for (let j = 0; j < numCols; j++) {
+            const value = document.getElementById(`row-${i}-col-${j}`).value;
+            rowData.push(value);
+        }
+        data.push(rowData.join(delimiter));
+    }
+    const fileContent = data.join('\n');
+    const blob = new Blob([fileContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+
+    if (delimiter == ',') {
+        link.download = fileName + '.csv';
+    } else if (delimiter == ';') {
+        link.download = fileName + '.ssv';
+    } else if (delimiter == '\t') {
+        link.download = fileName + '.tsv';
+    } else if (delimiter == 'json') {
+        saveJSON(numCols, numRows, fileName, delimiter);
+    }
+    
     document.body.appendChild(link);
     link.click();
 
