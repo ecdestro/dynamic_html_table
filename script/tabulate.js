@@ -1,8 +1,25 @@
 // copyright 2024 ecdestro
 
-function createTable() {
-    const numRows = parseInt(prompt("Number of initial rows:"));
-    const numCols = parseInt(prompt("Number of initial colums:"));
+document.getElementById("table-generator").addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const numCols = parseInt(document.getElementById('numCols').value);
+    const numRows = parseInt(document.getElementById('numRows').value);
+
+    createTable(numCols, numRows);
+});
+
+document.getElementById("file-generator").addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const numCols = parseInt(document.getElementById('numCols').value);
+    const numRows = parseInt(document.getElementById('numRows').value);
+    const fileName = document.getElementById('file-name').value;
+    
+    saveData(numCols, numRows, fileName);
+});
+
+function createTable(numCols, numRows) {
     const tableContainer = document.getElementById("table-container");
 
     let tableHTML = "<table>";
@@ -24,10 +41,8 @@ function createTable() {
     tableContainer.innerHTML = tableHTML;
 }
 
-function saveData() {
-    const numRows = parseInt(prompt("Number of rows:"));
-    const numCols = parseInt(prompt("Number of columns"));
-    const data = {};
+function saveData(numCols, numRows, fileName) {
+    const data = { table: [] };
 
     for (let i = 0; i < numRows; i++) {
         const rowData = {};
@@ -37,7 +52,18 @@ function saveData() {
 
             rowData[header] = value;
         }
-        data[`row-${i}`] = rowData;
+        data.table.push(rowData);
     }
-    console.log(JSON.stringify(data, null, 2));
+    var jsonData = JSON.stringify(data, null, 2);
+    var blob = new Blob([jsonData], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = fileName + '.json';
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 }
