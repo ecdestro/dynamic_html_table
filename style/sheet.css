@@ -1,24 +1,27 @@
-body {
-    background-color:   black;
-    color:  darkgray;
-    font-family: Arial, Helvetica, sans-serif;
-}
+/* copyright 2024 ecdestro */
 
-form {
-    width: fit-content;
-    background-color: #777777;
-    color: black;
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-label {
-    display: inline-block;
-    clear: left;
-    width: 150px;
-    text-align: right;
-}
-
-input {
-    display: inline-block;
-    text-align: left;
-}
+table {
+    width: 60%;
+    border-collapse: collapse;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    text-align: center;
+    margin: 10pt;
+    padding: 0%;
+  }
+  table, th, td {
+    border: 1px solid black;
+  }
+  th {
+    background-color: skyblue;
+    text-align: center;
+    height: 30px;
+  }
+  tr {
+    background-color: white;
+  }
+  tr:hover {
+    background-color: lightgray;
+  }
+  .highlight {
+    background-color: lightgreen;
+  }

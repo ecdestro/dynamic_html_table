@@ -48,9 +48,12 @@ function saveJSON(numCols, numRows, fileName, delimiter) {
     var blob = new Blob([jsonData], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
     var link = document.createElement('a');
-    link.href = url;
-    link.download = fileName + '.json';
-
+    link.href = url;        
+    if (fileName == '') {
+        link.download = 'data.json';
+    } else {
+        link.download = fileName + '.json'
+    }
     document.body.appendChild(link);
     link.click();
 
@@ -72,39 +75,37 @@ document.getElementById('file-generator').addEventListener('submit', function(ev
 function saveData(numCols, numRows, fileName, delimiter) {
     const data = [];
     const headerRow = [];
-    for (let j = 0; j < numCols; j++) {
-        const header = document.getElementById(`header-${j}`).value;
-        headerRow.push(header);
-    }
-    data.push(headerRow.join(delimiter));
-    
-    for (let i = 0; i < numRows; i++) {
-        const rowData = [];
-        for (let j = 0; j < numCols; j++) {
-            const value = document.getElementById(`row-${i}-col-${j}`).value;
-            rowData.push(value);
-        }
-        data.push(rowData.join(delimiter));
-    }
-    const fileContent = data.join('\n');
-    const blob = new Blob([fileContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
 
-    if (delimiter == ',') {
-        link.download = fileName + '.csv';
-    } else if (delimiter == ';') {
-        link.download = fileName + '.ssv';
-    } else if (delimiter == '\t') {
-        link.download = fileName + '.tsv';
-    } else if (delimiter == 'json') {
+    if (delimiter == 'json') {
         saveJSON(numCols, numRows, fileName, delimiter);
+    } else {
+        for (let j = 0; j < numCols; j++) {
+            const header = document.getElementById(`header-${j}`).value;
+            headerRow.push(header);
+        }
+        data.push(headerRow.join(','));
+        
+        for (let i = 0; i < numRows; i++) {
+            const rowData = [];
+            for (let j = 0; j < numCols; j++) {
+                const value = document.getElementById(`row-${i}-col-${j}`).value;
+                rowData.push(value);
+            }
+            data.push(headerRow.join(','));
+        }
+        const fileContent = data.join('\n');
+        const blob = new Blob([fileContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        if (fileName == '') {
+            link.download = 'data.csv';
+        } else {
+            link.download = fileName + '.csv'
+        }
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     }
-    
-    document.body.appendChild(link);
-    link.click();
-
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
 }
