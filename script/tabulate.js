@@ -31,7 +31,40 @@ function createTable(numCols, numRows) {
     tableContainer.innerHTML = tableHTML;
 }
 
-function saveJSON(numCols, numRows, fileName, delimiter) {
+function saveCSV(numCols, numRows, fileName) {
+    const data = [];
+    const headerRow = [];
+    for (let j = 0; j < numCols; j++) {
+        const header = document.getElementById(`header-${j}`).value;
+        headerRow.push(header);
+    }
+    data.push(headerRow.join(','));
+    
+    for (let i = 0; i < numRows; i++) {
+        const rowData = [];
+        for (let j = 0; j < numCols; j++) {
+            const value = document.getElementById(`row-${i}-col-${j}`).value;
+            rowData.push(value);
+        }
+        data.push(rowData.join(','));
+    }
+    const fileContent = data.join('\n');
+    const blob = new Blob([fileContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    if (fileName == '') {
+        link.download = 'data.csv';
+    } else {
+        link.download = fileName + '.csv'
+    }
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function saveJSON(numCols, numRows, fileName) {
     const data = { table: [] };
 
     for (let i = 0; i < numRows; i++) {
@@ -73,39 +106,9 @@ document.getElementById('file-generator').addEventListener('submit', function(ev
 });
 
 function saveData(numCols, numRows, fileName, delimiter) {
-    const data = [];
-    const headerRow = [];
-
     if (delimiter == 'json') {
-        saveJSON(numCols, numRows, fileName, delimiter);
+        saveJSON(numCols, numRows, fileName);
     } else {
-        for (let j = 0; j < numCols; j++) {
-            const header = document.getElementById(`header-${j}`).value;
-            headerRow.push(header);
-        }
-        data.push(headerRow.join(','));
-        
-        for (let i = 0; i < numRows; i++) {
-            const rowData = [];
-            for (let j = 0; j < numCols; j++) {
-                const value = document.getElementById(`row-${i}-col-${j}`).value;
-                rowData.push(value);
-            }
-            data.push(headerRow.join(','));
-        }
-        const fileContent = data.join('\n');
-        const blob = new Blob([fileContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        if (fileName == '') {
-            link.download = 'data.csv';
-        } else {
-            link.download = fileName + '.csv'
-        }
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        saveCSV(numCols, numRows, fileName);
     }
 }
